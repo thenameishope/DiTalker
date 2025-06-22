@@ -1,0 +1,534 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <!-- Required meta tags -->
+    <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  
+  <!-- 核心 SEO Meta 标签 -->
+  <title>DiTalker: High-Quality Speaking Style Controllable Portrait Animation | DiT-Based Framework</title>
+  <meta name="description" content="DiTalker: A unified Diffusion Transformer (DiT) framework for audio-driven portrait animation with precise lip sync, dynamic head movements, and emotion control. Achieves state-of-the-art results in style-controllable video synthesis.">
+  <meta name="keywords" content="DiTalker, Portrait Animation, Diffusion Transformer, DiT, Lip Synchronization, Audio-Driven Animation, Speaking Style Control, Head Movement Synthesis, Emotion Controllable Video">
+  <meta name="robots" content="index, follow">
+  
+  <!-- Open Graph 社交媒体标签 -->
+  <meta property="og:title" content="DiTalker: High-Quality Speaking Style Controllable Portrait Animation">
+  <meta property="og:description" content="A DiT-based model for generating portrait videos with precise lip sync and dynamic style control through audio input.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://fenghe12.github.io/ditalker/">
+  <meta property="og:image" content="https://fenghe12.github.io/ditalker/gfx/main-0409-1.png"> <!-- 替换为实际图片URL -->
+  
+  <!-- Twitter 卡片标签 -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="DiTalker: Style-Controllable Portrait Animation via Diffusion Transformers">
+  <meta name="twitter:description" content="Unified framework for high-fidelity talking head generation with emotion and motion control.">
+  <meta name="twitter:image" content="https://fenghe12.github.io/ditalker/gfx/main-0409-1.png"> <!-- 替换为实际图片URL -->
+  
+  <!-- 规范链接 & 移动端优化 -->
+  <link rel="canonical" href="https://fenghe12.github.io/ditalker/">
+  <meta name="mobile-web-app-capable" content="yes">
+  
+  <!-- 学术资源声明 -->
+  <meta name="citation_title" content="DiTalker: A Unified DiT-based Framework for High-Quality and Speaking Styles Controllable Portrait Animation">
+  <meta name="citation_publication_date" content="2025"> <!-- 更新为实际年份 -->
+  <meta name="citation_author" content="He Feng, et al."> <!-- 补充作者名 -->
+  
+  <!-- 浏览器兼容性 -->
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  
+  <!-- 原有资源保留 -->
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap" rel="stylesheet">
+ <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+    integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap" rel="stylesheet"> 
+
+  <title>DiTalker</title>
+  <style>
+    *{
+    font-family: 'Roboto', sans-serif;
+    padding: 0;
+    margin: 0;
+    outline: none;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <br>
+    <div style="text-align: center;">  
+      <h1>DiTalker</h1>
+      <h3> DiTalker: A Unified DiT-based Framework for High-Quality and Speaking Styles Controllable Portrait Animation</h3>
+      <!-- <div style="margin-top: 15px;">
+        <span style="margin-right: 15px; font-size: 1.3em;"><a href="https://m-niemeyer.github.io/" target="_blank">Michael Niemeyer<sup>1,2,3</sup></a></span>
+        <span style="margin-right: 15px; font-size: 1.3em;"><a href="https://jonbarron.info/" target="_blank">Jonathan T. Barron<sup>3</sup></a></span>
+        <span style="margin-right: 15px; font-size: 1.3em;"><a href="https://bmild.github.io/" target="_blank">Ben Mildenhall<sup>3</sup></a></span>
+      </div>
+      <div>
+        <span style="margin-right: 15px; font-size: 1.3em;"><a href="https://msajjadi.com/" target="_blank">Mehdi S. M. Sajjadi<sup>3</sup></a></span>
+        <span style="margin-right: 15px; font-size: 1.3em;"><a href="http://cvlibs.net/" target="_blank">Andreas Geiger<sup>1,2</sup></a></span>
+        <span style="font-size: 1.3em;"><a href="https://research.google/people/107229/" target="_blank">Noha Radwan<sup>3</sup></a></span>
+      </div>
+      <div style="margin-top: 15px;">
+        <span style="margin-right: 20px; font-size: 1.2em;"><sup>1</sup>Max Planck Institute for Intelligent
+          Systems</span>
+        <span style="margin-right: 20px; font-size: 1.2em;"><sup>2</sup>University of Tübingen</span>
+        <span style="font-size: 1.2em;"><sup>3</sup>Google Research</span>
+      </div>
+      <div>
+        <span style="margin-right: 10px; font-size: 1.3em;">CVPR 2022 (oral)</span>
+      </div> -->
+    </div>
+    <!-- <div class="text-center" style="font-size: 1.5em; margin-top: 25px;">
+      <a class="btn btn-primary btn-lg" target="_blank"
+        href="https://drive.google.com/file/d/1S_NnmhypZjyMfwqcHg-YbWSSYNWdqqlo/view?usp=sharing" role="button"
+        style="margin-right: 10px; margin-bottom: 10px;">Paper</a>
+      <a class="btn btn-primary btn-lg" target="_blank"
+        href="https://youtu.be/QyyyvA4-Kwc" role="button"
+        style="margin-right: 10px; margin-bottom: 10px;">Video</a>
+      <a class="btn btn-primary btn-lg" target="_blank"
+        href="https://drive.google.com/file/d/15ip8Fvfxp6rNRfBnbJEnFCjIJeFMH4CE/view?usp=sharing" role="button"
+        style="margin-right: 10px; margin-bottom: 10px;">Supplementary</a>
+      <a class="btn btn-primary btn-lg" target="_blank"
+        href="https://arxiv.org/abs/2112.00724" role="button"
+        style="margin-right: 10px;  margin-bottom: 10px;">Arxiv</a>
+      <a class="btn btn-primary btn-lg" target="_blank"
+        href="https://drive.google.com/file/d/1kYknB2Ap3I3avstmPxAa9IiW8m85AZEF/view?usp=sharing" role="button"
+        style="margin-right: 10px; margin-bottom: 10px;">Poster</a>
+      <a class="btn btn-primary btn-lg" target="_blank"
+        href="https://github.com/google-research/google-research/tree/master/regnerf" role="button"
+        style="margin-bottom: 10px;">Code</a>
+    </div> -->
+    <div class="text-center" style="font-size: 1.5em; margin-top: 25px;">
+      <a class="btn btn-primary btn-lg" href="javascript:void(0);" role="button"
+        style="margin-right: 10px; margin-bottom: 10px;">Paper</a>
+      <a class="btn btn-primary btn-lg" href="javascript:void(0);" role="button"
+        style="margin-right: 10px; margin-bottom: 10px;">Video</a>
+      <a class="btn btn-primary btn-lg" href="javascript:void(0);" role="button"
+        style="margin-right: 10px; margin-bottom: 10px;">Supplementary</a>
+      <a class="btn btn-primary btn-lg" href="javascript:void(0);" role="button"
+        style="margin-right: 10px; margin-bottom: 10px;">Arxiv</a>
+      <a class="btn btn-primary btn-lg" href="javascript:void(0);" role="button"
+        style="margin-right: 10px; margin-bottom: 10px;">Poster</a>
+      <a class="btn btn-primary btn-lg" href="javascript:void(0);" role="button"
+        style="margin-bottom: 10px;">Code</a>
+    </div>
+
+    <div style="margin-top: 30px;">
+      <h2 class="text-center">
+        Abstract
+      </h2>
+      <p style="font-style: italic; margin-bottom: 5px;">
+        Portrait animation aims to synthesize talking videos from a static reference face, conditioned on audio and style frame cues (\eg, emotion and head poses), while ensuring precise lip synchronization and faithful reproduction of speaking styles.
+Existing diffusion-based portrait animation methods mainly focus on  lip synchronization or static emotion transformation, often overlooking dynamic styles such as  head movements.
+Moreover, most of these methods rely on dual U-Net architecture, which preserves  identity consistency but incurs additional computational overhead.
+To this end, we propose DiTalker, a unified DiT-based framework for speaking style controllable portrait animation.
+We design a Style-Emotion Encoding Module that employs two separate branches: a style branch extracts style embeddings for head poses and movements, and an emotion branch extracts emotion features.
+We further introduce an Audio-Style Fusion Module that decouples audio  and speaking styles via two parallel cross attention layers, using these features to guide the animation process.
+To enhance the quality of results, we further introduce two optimization constraints: one to improve lip synchronization and the other to preserve fine-grained identity details.
+Extensive experiments  demonstrate the superiority of DiTalker in terms of lip synchronization and speaking style controllability.
+      </p>
+      <p style="font-size: 1.2em; margin-top: 0px;">
+        <span style="font-weight: bold;">TL;DR:</span> We propose DiTalker, a DiT-based model for portrait animation that achieves precise lip sync and dynamic style control through dedicated audio-style fusion, outperforming existing methods..
+      </p>
+    </div>
+    <!-- <div style="margin-top:10px;">
+      <h2 class="text-center">
+        Video
+      </h2>
+      <div class="embed-responsive embed-responsive-16by9">
+        <iframe class="embed-responsive-item" src="https://www.youtube.com/embed/QyyyvA4-Kwc" allowfullscreen></iframe>
+      </div>
+    </div> -->
+
+
+    <div style="margin-top: 50px;">
+      <div class="text-center">
+        <h2>
+          Method Overview
+        </h2>
+        <img src="gfx\main-0409-1.png" width=100% class="img-fluid" alt="Responsive image">
+      </div>
+      <div style="margin-top: 35px;">
+       <p>
+Overview of our proposed DiTalker, which consists of a Style-Emotion Encoding Module (SEEM), an Audio-Style Fusion Module (ASFM), and the DiT generation backbone.
+SEEM takes style frames <i>V<sub>s</sub></i> and phonemes extracted from driving audio <i>a</i> as inputs, extracting style features <i>c<sub>s</sub></i> and emotion features <i>c<sub>emo</sub></i>.
+ASFM uses <i>c<sub>s</sub></i> and <i>c<sub>a</sub></i> (extracted by the Audio Encoder) as inputs, injecting information into the DiT backbone through two attention layers, and scales the outputs of the two attentions using <i>s<sub>ϕ</sub></i> and <i>s<sub>α</sub></i> extracted by the Scale Adapter in SEEM.
+The DiT generation backbone animates the Ref Image <i>x</i> (or Video Frames) based on the features provided by SEEM and ASFM. Emotion Cross Attention is inserted after ASFM to enhance emotion control, where <i>c<sub>emo</sub></i> serves as keys and values.
+</p>
+      </div>
+    </div>
+
+    <div style="margin-top:50px;">
+      <h2 class="text-center">Video Results</h2>
+      
+      <!-- HDTF测试集对比 -->
+      <h4>Qualitative comparison with baseline on the HDTF test set.</h4>
+      <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12 gallery">
+          <div style="max-width: 800px; margin: 0 auto; background: #f5f5f5; padding: 10px; border-radius: 8px;">
+            <video controls loop muted style="width: 100%; display: block;">
+              <source src="./hdtf/hdtf_compatible.mp4" type="video/mp4">
+              Your browser does not support the video tag.
+            </video>
+          </div>
+        </div>
+      </div>
+    
+      <!-- Mix Emotion测试集对比 -->
+      <h4>Qualitative comparison with baseline on the Mix Emotion test set.</h4>
+      <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12 gallery">
+          <div style="max-width: 800px; margin: 0 auto; background: #f5f5f5; padding: 10px; border-radius: 8px;">
+            <video controls loop muted style="width: 100%; display: block;">
+              <source src="./mix_emotion/asianemo_compatible.mp4" type="video/mp4">
+              Your browser does not support the video tag.
+            </video>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+      <h4>Qualitative results under background noise (such as crowd noise, street noise, heavy rain noise, etc).</h4>
+<div class="row">
+  <div class="col-md-12 col-sm-12 col-xs-12 gallery" id="noise-gallery" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; justify-items: center; margin: 0 auto; max-width: 1200px;">
+    <!-- 视频将通过 JavaScript 动态加载 -->
+  </div>
+</div>
+
+<script>
+  // 背景噪音视频文件列表
+  const noiseFiles = [
+    "dayu.mp4",
+    "dayu2.mp4",
+    "dayu3.mp4",
+    "leaf.mp4",
+    "renqun1.mp4",
+    "renqun2.mp4",
+    "shangchang.mp4",
+    "traffic.mp4",
+    "wind.mp4",
+    "wind2.mp4"
+  ];
+
+  // 视频目录路径
+  const noiseDir = "noisy/";
+  
+  const noiseGrid = document.getElementById("noise-gallery");
+
+  // 创建均匀分布的视频网格
+  noiseFiles.forEach((filename) => {
+    const videoWrapper = document.createElement("div");
+    videoWrapper.style.position = "relative";
+    videoWrapper.style.width = "256px";
+    videoWrapper.style.height = "256px";
+    videoWrapper.style.margin = "10px";
+    
+    const videoElement = document.createElement("video");
+    videoElement.controls = true;
+    videoElement.loop = true;
+    videoElement.style.width = "100%";
+    videoElement.style.height = "100%";
+    videoElement.style.objectFit = "cover";
+    videoElement.style.borderRadius = "8px";
+    videoElement.style.boxShadow = "0 2px 8px rgba(0,0,0,0.1)";
+    videoElement.style.cursor = "pointer";
+    
+    const sourceElement = document.createElement("source");
+    sourceElement.src = noiseDir + filename;
+    sourceElement.type = "video/mp4";
+    
+    // 添加视频标题（中文翻译）
+    const titleMap = {
+      "dayu.mp4": "大雨",
+      "dayu2.mp4": "大雨2",
+      "dayu3.mp4": "大雨3",
+      "leaf.mp4": "树叶声",
+      "renqun1.mp4": "人群1",
+      "renqun2.mp4": "人群2",
+      "shangchang.mp4": "商场噪音",
+      "traffic.mp4": "交通噪音",
+      "wind.mp4": "风声",
+      "wind2.mp4": "风声2"
+    };
+    
+    const videoTitle = document.createElement("div");
+    videoTitle.textContent = titleMap[filename] || filename.replace('.mp4', '');
+    videoTitle.style.position = "absolute";
+    videoTitle.style.bottom = "10px";
+    videoTitle.style.left = "10px";
+    videoTitle.style.right = "10px";
+    videoTitle.style.color = "white";
+    videoTitle.style.backgroundColor = "rgba(0,0,0,0.7)";
+    videoTitle.style.padding = "4px 8px";
+    videoTitle.style.borderRadius = "4px";
+    videoTitle.style.fontSize = "12px";
+    videoTitle.style.textAlign = "center";
+    videoTitle.style.overflow = "hidden";
+    videoTitle.style.textOverflow = "ellipsis";
+    videoTitle.style.whiteSpace = "nowrap";
+    
+    // 点击播放/暂停
+    videoWrapper.addEventListener('click', function() {
+      if (videoElement.paused) {
+        videoElement.play().catch(e => console.log("播放失败:", e));
+      } else {
+        videoElement.pause();
+      }
+    });
+    
+    videoElement.appendChild(sourceElement);
+    videoWrapper.appendChild(videoElement);
+    videoWrapper.appendChild(videoTitle);
+    noiseGrid.appendChild(videoWrapper);
+  });
+</script>
+
+<style>
+  /* 响应式调整 */
+  @media (max-width: 900px) {
+    #noise-gallery {
+      grid-template-columns: repeat(2, 1fr) !important;
+    }
+  }
+  
+  @media (max-width: 600px) {
+    #noise-gallery {
+      grid-template-columns: 1fr !important;
+    }
+    
+    #noise-gallery div {
+      width: 100% !important;
+      height: auto !important;
+      aspect-ratio: 1/1;
+    }
+  }
+</style>
+      <!-- <h4>Qualitative comparison results under driven audio with accents (strong English and Chinese accents).</h4>
+      <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12 gallery">
+          <div class="embed-responsive embed-responsive-21by9">
+            <video controls loop muted autoplay class="embed-responsive-item">
+              <source src="C:\Users\fenghe\Desktop\ditalker\videos\speaking_style_head_movements.mp4" type="video/mp4">
+            </video>
+          </div>
+        </div>
+      </div> -->
+      <h4>Qualitative comparison results under driven audio with accents (strong English and Chinese accents)</h4>
+<div class="row">
+  <div class="col-md-12 col-sm-12 col-xs-12 gallery" id="video-gallery" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
+    <!-- 视频将通过 JavaScript 动态加载 -->
+  </div>
+</div>
+
+<script>
+  // 视频文件列表
+  const videoFiles = [
+    "Irish.mp4",
+    "mid.mp4",
+    "minnan.mp4",
+    "northern.mp4",
+    "scottish.mp4",
+    "shanghai.mp4",
+    "shanxi.mp4",
+    "sichuan.mp4",
+    "southern.mp4",
+    "welsh.mp4",
+    "welsh1.mp4",
+    "yueyu.mp4"
+  ];
+
+  // 视频目录路径
+  const videoDir = "accent/";
+  
+  const videoGrid = document.getElementById("video-gallery");
+
+  // 创建4行×3列的视频网格
+  videoFiles.forEach((filename) => {
+    const videoWrapper = document.createElement("div");
+    videoWrapper.style.position = "relative";
+    videoWrapper.style.width = "256px";
+    videoWrapper.style.height = "256px";
+    videoWrapper.style.margin = "0 auto";
+    
+    const videoElement = document.createElement("video");
+    videoElement.controls = false; // 隐藏原生控制条
+    videoElement.loop = true;
+    videoElement.muted = false; // 默认静音关闭（但浏览器策略可能仍会阻止自动播放声音）
+    videoElement.style.width = "100%";
+    videoElement.style.height = "100%";
+    videoElement.style.objectFit = "cover";
+    videoElement.style.borderRadius = "8px";
+    videoElement.style.boxShadow = "0 2px 8px rgba(0,0,0,0.1)";
+    videoElement.style.cursor = "pointer";
+    
+    const sourceElement = document.createElement("source");
+    sourceElement.src = videoDir + filename;
+    sourceElement.type = "video/mp4";
+    
+    // 添加视频标题
+    const videoTitle = document.createElement("div");
+    videoTitle.textContent = filename.replace('.mp4', '');
+    videoTitle.style.position = "absolute";
+    videoTitle.style.bottom = "10px";
+    videoTitle.style.left = "10px";
+    videoTitle.style.color = "white";
+    videoTitle.style.backgroundColor = "rgba(0,0,0,0.5)";
+    videoTitle.style.padding = "2px 8px";
+    videoTitle.style.borderRadius = "4px";
+    videoTitle.style.fontSize = "12px";
+    
+    // 点击事件：播放/暂停
+    videoWrapper.addEventListener('click', function() {
+      if (videoElement.paused) {
+        videoElement.play()
+          .then(() => {
+            videoElement.muted = false; // 尝试取消静音
+          })
+          .catch(e => {
+            console.log("自动播放被阻止:", e);
+            videoElement.controls = true; // 如果自动播放被阻止，显示控制条
+          });
+      } else {
+        videoElement.pause();
+      }
+    });
+    
+    videoElement.appendChild(sourceElement);
+    videoWrapper.appendChild(videoElement);
+    videoWrapper.appendChild(videoTitle);
+    videoGrid.appendChild(videoWrapper);
+  });
+</script>
+
+<style>
+  /* 响应式调整 */
+  @media (max-width: 768px) {
+    #video-gallery {
+      grid-template-columns: repeat(2, 1fr) !important;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    #video-gallery {
+      grid-template-columns: 1fr !important;
+    }
+  }
+</style>
+
+<h4>Qualitative results under highly emotionally driven audio.</h4>
+<div class="row">
+  <div class="col-md-12 col-sm-12 col-xs-12 gallery" id="emotion-gallery" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; justify-items: center;">
+    <!-- 视频将通过 JavaScript 动态加载 -->
+  </div>
+</div>
+
+<script>
+  // 情感视频文件列表
+  const emotionFiles = [
+    "angry.mp4",
+    "disgust.mp4",
+    "disgust2.mp4",
+    "laugh.mp4",
+    "sad.mp4",
+    "scream.mp4",
+    "sorrow.mp4"
+  ];
+
+  // 视频目录路径
+  const emotionDir = "emotion/";
+  
+  const emotionGrid = document.getElementById("emotion-gallery");
+
+  // 创建均匀分布的视频网格
+  emotionFiles.forEach((filename) => {
+    const videoWrapper = document.createElement("div");
+    videoWrapper.style.position = "relative";
+    videoWrapper.style.width = "256px";
+    videoWrapper.style.height = "256px";
+    videoWrapper.style.margin = "10px";
+    
+    const videoElement = document.createElement("video");
+    videoElement.controls = true; // 显示控制条
+    videoElement.loop = true;
+    videoElement.style.width = "100%";
+    videoElement.style.height = "100%";
+    videoElement.style.objectFit = "cover";
+    videoElement.style.borderRadius = "8px";
+    videoElement.style.boxShadow = "0 2px 8px rgba(0,0,0,0.1)";
+    
+    const sourceElement = document.createElement("source");
+    sourceElement.src = emotionDir + filename;
+    sourceElement.type = "video/mp4";
+    
+    // 添加视频标题
+    const videoTitle = document.createElement("div");
+    videoTitle.textContent = filename.replace('.mp4', '');
+    videoTitle.style.position = "absolute";
+    videoTitle.style.bottom = "10px";
+    videoTitle.style.left = "10px";
+    videoTitle.style.right = "10px";
+    videoTitle.style.color = "white";
+    videoTitle.style.backgroundColor = "rgba(0,0,0,0.5)";
+    videoTitle.style.padding = "4px 8px";
+    videoTitle.style.borderRadius = "4px";
+    videoTitle.style.fontSize = "12px";
+    videoTitle.style.textAlign = "center";
+    videoTitle.style.overflow = "hidden";
+    videoTitle.style.textOverflow = "ellipsis";
+    videoTitle.style.whiteSpace = "nowrap";
+    
+    videoElement.appendChild(sourceElement);
+    videoWrapper.appendChild(videoElement);
+    videoWrapper.appendChild(videoTitle);
+    emotionGrid.appendChild(videoWrapper);
+  });
+</script>
+
+<style>
+  /* 响应式调整 */
+  @media (max-width: 768px) {
+    #emotion-gallery {
+      grid-template-columns: repeat(2, 1fr) !important;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    #emotion-gallery {
+      grid-template-columns: 1fr !important;
+    }
+  }
+</style>
+
+      
+      
+      <div>
+        <h2 class="text-center" style="margin-top: 30px;">
+          Homepage Template
+        </h2>
+        <p>
+          If you want to use this fully-responsive and easy-to-adapt homepage template, you can download it from <a href="https://github.com/m-niemeyer/regnerf" target="_blank">the github repository</a>.
+        </p>
+      </div>
+
+      <!-- Optional JavaScript -->
+      <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+      <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+        integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+        crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+      <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
+</body>
+
+</html>
